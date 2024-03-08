@@ -32,14 +32,14 @@ func (repo *userRepository) Create(model entity.User) (string, error) {
 }
 
 // Log
-func (repo *userRepository) CreateLog(model entity.UserLog) (string, error) {
+func (repo *userRepository) CreateLog(model entity.UserLog) error {
 	db := repo.DB.Create(&model)
 	err := db.Error
 	if err != nil {
 		log.Println("error cause: ", err)
-		return "", err
+		return err
 	}
-	return model.ID, nil
+	return nil
 }
 
 func (repo *userRepository) Delete(model *entity.User) error {

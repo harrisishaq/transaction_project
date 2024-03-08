@@ -11,6 +11,6 @@ type (
 		List(limit, offset int) ([]entity.User, int64, error)
 		Update(model *entity.User) error
 		// Log
-		CreateLog(model entity.UserLog) (string, error)
+		CreateLog(model entity.UserLog) error
 	}
 )
