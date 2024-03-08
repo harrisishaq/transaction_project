@@ -31,6 +31,17 @@ func (repo *categoryRepository) Create(model entity.Category) (string, error) {
 	return model.ID.String(), nil
 }
 
+// Log
+func (repo *categoryRepository) CreateLog(model entity.CategoryLog) error {
+	db := repo.DB.Create(&model)
+	err := db.Error
+	if err != nil {
+		log.Println("error cause: ", err)
+		return err
+	}
+	return nil
+}
+
 func (repo *categoryRepository) Delete(model *entity.Category) error {
 	qResult := repo.DB.Clauses(clause.Returning{}).Delete(model)
 	if errors.Is(qResult.Error, gorm.ErrRecordNotFound) {

@@ -9,3 +9,11 @@ type Category struct {
 	Products []Product
 	Audit    *Audit `gorm:"type:json;serializer:json;default:null"`
 }
+
+type CategoryLog struct {
+	ID       string `gorm:"type:varchar;size:50"`
+	Name     string
+	IsActive bool
+	Products []Product
+	Audit    *Audit `gorm:"type:json;serializer:json;default:null"`
+}

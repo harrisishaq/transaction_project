@@ -9,5 +9,7 @@ type (
 		Get(id string) (*entity.Category, error)
 		List(limit, offset int) ([]entity.Category, int64, error)
 		Update(model *entity.Category) error
+		// Log
+		CreateLog(model entity.CategoryLog) error
 	}
 )
