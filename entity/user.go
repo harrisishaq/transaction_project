@@ -14,3 +14,12 @@ type User struct {
 	LastLoginDate *time.Time `gorm:"default:null"`
 	Audit         *Audit     `gorm:"type:json;serializer:json;default:null"`
 }
+
+type UserLog struct {
+	ID            string `gorm:"type:varchar;size:50"`
+	Name          string `gorm:"size:255;" json:"name"`
+	Email         string `gorm:"size:255;unique" json:"email"`
+	Password      string
+	LastLoginDate *time.Time `gorm:"default:null"`
+	Audit         *Audit     `gorm:"type:json;serializer:json;default:null"`
+}

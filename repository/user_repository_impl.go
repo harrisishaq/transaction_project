@@ -16,8 +16,6 @@ type (
 )
 
 func NewUserRepository(conn *gorm.DB) UserRepository {
-	conn.Model(&entity.User{})
-
 	return &userRepository{
 		DB: conn,
 	}
@@ -31,6 +29,17 @@ func (repo *userRepository) Create(model entity.User) (string, error) {
 		return "", err
 	}
 	return model.ID.String(), nil
+}
+
+// Log
+func (repo *userRepository) CreateLog(model entity.UserLog) (string, error) {
+	db := repo.DB.Create(&model)
+	err := db.Error
+	if err != nil {
+		log.Println("error cause: ", err)
+		return "", err
+	}
+	return model.ID, nil
 }
 
 func (repo *userRepository) Delete(model *entity.User) error {
