@@ -54,6 +54,17 @@ func (repo *userRepository) Get(id string) (*entity.User, error) {
 	return &result, nil
 }
 
+func (repo *userRepository) GetByEmail(email string) (*entity.User, error) {
+	var result entity.User
+	qResult := repo.DB.First(&result, "email = ?", email)
+	if errors.Is(qResult.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	} else if qResult.Error != nil {
+		return nil, qResult.Error
+	}
+	return &result, nil
+}
+
 func (repo *userRepository) List(limit, offset int) ([]entity.User, int64, error) {
 	var results []entity.User
 	var tx = repo.DB.Model(&entity.User{})
