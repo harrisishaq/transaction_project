@@ -123,7 +123,8 @@ func (service *userService) saveLog(data *entity.User) (err error) {
 		LastLoginDate: data.LastLoginDate,
 		Audit:         data.Audit,
 	}
-	_, err = service.repoUser.CreateLog(dataLog)
+
+	err = service.repoUser.CreateLog(dataLog)
 	if err != nil {
 		log.Printf("Error while creating log:%+v\n ", err)
 		return model.NewError("500", "Internal server error.")
