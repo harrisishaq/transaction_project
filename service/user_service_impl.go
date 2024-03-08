@@ -114,6 +114,24 @@ func (svc *userService) ListUser() ([]model.DataUserResponse, int64, error) {
 	return respData, total, nil
 }
 
+func (service *userService) saveLog(data *entity.User) (err error) {
+	dataLog := entity.UserLog{
+		ID:            fmt.Sprintf("%s-%d", data.ID.String(), data.Audit.CurrNo),
+		Name:          data.Name,
+		Email:         data.Email,
+		Password:      data.Password,
+		LastLoginDate: data.LastLoginDate,
+		Audit:         data.Audit,
+	}
+	_, err = service.repoUser.CreateLog(dataLog)
+	if err != nil {
+		log.Printf("Error while creating log:%+v\n ", err)
+		return model.NewError("500", "Internal server error.")
+	}
+
+	return
+}
+
 func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {
 	oldData, err := svc.repoUser.Get(req.ID)
 	if err != nil {
@@ -133,6 +151,12 @@ func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {
 
 	logReason := fmt.Sprintf("Perubahan data oleh %v", req.ID)
 	oldData.Audit.LogReason = &logReason
+
+	err = svc.saveLog(oldData)
+	if err != nil {
+		log.Printf("Error while creating log: %v\n", err)
+		return err
+	}
 
 	timeNow := time.Now()
 
