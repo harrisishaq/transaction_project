@@ -81,6 +81,10 @@ func (ctrl *userController) ListUsers(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
+	if request.Filter == nil {
+		request.Filter = make(map[string]interface{})
+	}
+
 	data, total, err := ctrl.service.ListUser(*request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
