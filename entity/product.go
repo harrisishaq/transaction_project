@@ -3,7 +3,7 @@ package entity
 import "github.com/google/uuid"
 
 type Product struct {
-	ID          uuid.UUID `gorm:"primaryKey;type:binary(16)"`
+	ID          uuid.UUID `gorm:"primaryKey;type:varchar(36)"`
 	Name        string
 	Qty         int
 	Price       string
