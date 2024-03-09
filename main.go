@@ -6,12 +6,14 @@ import (
 	"test_project/config"
 	"test_project/controller"
 	"test_project/entity"
+	"test_project/helpers"
 	"test_project/model"
 	"test_project/repository"
 	"test_project/service"
 	"time"
 
 	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -24,6 +26,7 @@ func main() {
 
 	var e = echo.New()
 	e.Use(middleware.CORS())
+	e.Validator = &helpers.EchoValidator{Validator: validator.New()}
 
 	config.LoadConfig()
 	dbInit := config.InitDBConnection(config.GormConfig.DBHost, config.GormConfig.DBUser, config.GormConfig.DBPassword, config.GormConfig.DBName, config.GormConfig.DBPort)
