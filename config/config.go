@@ -13,6 +13,7 @@ var configStruct = map[string]interface{}{
 
 type EnvAppConfig struct {
 	DefaultPassword string `mapstructure:"DEFAULT_PASSWORD" validate:"required"`
+	DefaultEmail    string `mapstructure:"DEFAULT_EMAIL" validate:"required"`
 }
 
 var AppConfig EnvAppConfig
