@@ -40,6 +40,7 @@ require (
 )
 
 require (
+	github.com/go-gormigrate/gormigrate/v2 v2.1.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/google/uuid v1.6.0
