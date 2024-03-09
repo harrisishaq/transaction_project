@@ -10,7 +10,7 @@ import (
 
 type EnvGormConfig struct {
 	DBHost     string `mapstructure:"DB_HOST" validate:"required"`
-	DBPort     int    `mapstructure:"DB_PORT" validate:"required"`
+	DBPort     string `mapstructure:"DB_PORT" validate:"required"`
 	DBUser     string `mapstructure:"DB_USER" validate:"required"`
 	DBPassword string `mapstructure:"DB_PASSWORD" validate:"required"`
 	DBName     string `mapstructure:"DB_NAME" validate:"required"`
