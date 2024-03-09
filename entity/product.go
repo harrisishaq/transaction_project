@@ -15,13 +15,13 @@ type Product struct {
 }
 
 type ProductLog struct {
-	ID          string `gorm:"type:varchar;size:50"`
+	ID          string `gorm:"size:50"`
 	Name        string
 	Qty         int
 	Price       string
 	Description string
 	IsActive    bool
 	CategoryID  uuid.UUID
-	Category    Category `gorm:"foreignKey:CategoryID"`
-	Audit       *Audit   `gorm:"type:json;serializer:json;default:null"`
+	Category    interface{} `gorm:"type:json"`
+	Audit       *Audit      `gorm:"type:json;serializer:json;default:null"`
 }

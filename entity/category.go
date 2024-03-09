@@ -11,9 +11,9 @@ type Category struct {
 }
 
 type CategoryLog struct {
-	ID       string `gorm:"type:varchar;size:50"`
+	ID       string `gorm:"size:50"`
 	Name     string
 	IsActive bool
-	Products []Product
-	Audit    *Audit `gorm:"type:json;serializer:json;default:null"`
+	Products interface{} `gorm:"type:json"`
+	Audit    *Audit      `gorm:"type:json;serializer:json;default:null"`
 }

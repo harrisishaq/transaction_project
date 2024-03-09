@@ -16,7 +16,7 @@ type User struct {
 }
 
 type UserLog struct {
-	ID            string `gorm:"type:varchar;size:50"`
+	ID            string `gorm:"primaryKey;size:50"`
 	Name          string `gorm:"size:255;" json:"name"`
 	Email         string `gorm:"size:255;unique" json:"email"`
 	Password      string
