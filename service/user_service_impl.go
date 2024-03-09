@@ -8,6 +8,7 @@ import (
 	"test_project/repository"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -37,6 +38,7 @@ func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
 	timeNow := time.Now()
 
 	var newData = &entity.User{
+		ID:       uuid.New(),
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: fmt.Sprintf("%x", hashPassword),
