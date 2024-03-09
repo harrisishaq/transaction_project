@@ -15,6 +15,12 @@ type (
 		Name  string `json:"name" validate:"required"`
 		Email string `json:"email" validate:"required,email"`
 	}
+
+	ListUserRequest struct {
+		Page   int                    `json:"page"`
+		Limit  int                    `json:"limit"`
+		Filter map[string]interface{} `json:"filters"`
+	}
 )
 
 // response
