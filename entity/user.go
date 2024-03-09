@@ -18,7 +18,7 @@ type User struct {
 type UserLog struct {
 	ID            string `gorm:"primaryKey;size:50"`
 	Name          string `gorm:"size:255;" json:"name"`
-	Email         string `gorm:"size:255;unique" json:"email"`
+	Email         string `gorm:"size:255;" json:"email"`
 	Password      string
 	LastLoginDate *time.Time `gorm:"default:null"`
 	Audit         *Audit     `gorm:"type:json;serializer:json;default:null"`
