@@ -84,6 +84,11 @@ func (repo *categoryRepository) List(limit, offset int, filters map[string]inter
 				field = checkField[0]
 			}
 
+			if field == "is_active" {
+				tx.Where(fmt.Sprintf("%s = ?", field), value)
+				continue
+			}
+
 			switch reflect.TypeOf(value).Kind() {
 			case reflect.Float64, reflect.Int, reflect.Int64:
 				tx.Where(fmt.Sprintf("%s = ?", field), value)
@@ -118,6 +123,11 @@ func (repo *categoryRepository) listCount(model interface{}, filters map[string]
 			var checkField = strings.Split(field, " ")
 			if len(checkField) > 1 {
 				field = checkField[0]
+			}
+
+			if field == "is_active" {
+				tx.Where(fmt.Sprintf("%s = ?", field), value)
+				continue
 			}
 
 			switch reflect.TypeOf(value).Kind() {
