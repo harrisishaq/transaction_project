@@ -8,7 +8,7 @@ type (
 		Delete(model *entity.User) error
 		Get(id string) (*entity.User, error)
 		GetByEmail(email string) (*entity.User, error)
-		List(limit, offset int) ([]entity.User, int64, error)
+		List(limit, offset int, filters map[string]interface{}) ([]entity.User, int64, error)
 		Update(model *entity.User) error
 		// Log
 		CreateLog(model entity.UserLog) error

@@ -91,8 +91,17 @@ func (svc *userService) GetUser(id string) (*model.DataUserResponse, error) {
 	}, nil
 }
 
-func (svc *userService) ListUser() ([]model.DataUserResponse, int64, error) {
-	dataUsers, total, err := svc.repoUser.List(0, 0)
+func (svc *userService) ListUser(req model.ListUserRequest) ([]model.DataUserResponse, int64, error) {
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+
+	var offset = (req.Page - 1) * req.Limit
+	dataUsers, total, err := svc.repoUser.List(req.Limit, offset, req.Filter)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
 		return make([]model.DataUserResponse, 0), 0, model.NewError("500", "Internal server error.")

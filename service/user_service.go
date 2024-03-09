@@ -7,7 +7,7 @@ type (
 		CreateUser(req *model.CreateUserRequest) error
 		DeleteUser(id string) error
 		GetUser(id string) (*model.DataUserResponse, error)
-		ListUser() ([]model.DataUserResponse, int64, error)
+		ListUser(req model.ListUserRequest) ([]model.DataUserResponse, int64, error)
 		UpdateUser(req *model.UpdateUserRequest) error
 	}
 )
