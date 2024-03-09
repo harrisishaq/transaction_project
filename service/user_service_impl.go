@@ -59,15 +59,24 @@ func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
 }
 
 func (svc *userService) DeleteUser(id string) error {
-	dataUser, err := svc.repoUser.Get(id)
+	oldData, err := svc.repoUser.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
 		return model.NewError("500", "Internal server error.")
-	} else if dataUser == nil {
+	} else if oldData == nil {
 		return model.NewError("404", "Data not found.")
 	}
 
-	err = svc.repoUser.Delete(dataUser)
+	logReason := fmt.Sprintf("Data dihapus oleh %v", id)
+	oldData.Audit.LogReason = &logReason
+
+	err = svc.saveLog(oldData)
+	if err != nil {
+		log.Printf("Error while creating log: %v\n", err)
+		return err
+	}
+
+	err = svc.repoUser.Delete(oldData)
 	if err != nil {
 		log.Println("Error while delete data user, cause: ", err)
 		return model.NewError("500", "Internal server error.")
