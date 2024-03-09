@@ -8,7 +8,14 @@ import (
 
 var configStruct = map[string]interface{}{
 	"gorm-config": &GormConfig,
+	"app-config":  &AppConfig,
 }
+
+type EnvAppConfig struct {
+	DefaultPassword string `mapstructure:"DEFAULT_PASSWORD" validate:"required"`
+}
+
+var AppConfig EnvAppConfig
 
 func LoadConfig() {
 	viper.AddConfigPath(".")
