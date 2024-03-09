@@ -117,8 +117,7 @@ func (repo *userRepository) List(limit, offset int, filters map[string]interface
 		return make([]entity.User, 0), 0, err
 	}
 
-	var total int64
-	err = tx.Count(&total).Error
+	total, err := repo.listCount(&entity.User{}, filters)
 	if err != nil {
 		return make([]entity.User, 0), 0, err
 	}
@@ -128,7 +127,7 @@ func (repo *userRepository) List(limit, offset int, filters map[string]interface
 
 func (repo *userRepository) listCount(model interface{}, filters map[string]interface{}, condition ...interface{}) (int64, error) {
 	var results []entity.User
-	var tx = repo.DB.Model(&entity.User{})
+	var tx = repo.DB.Model(&model)
 
 	if len(filters) > 0 {
 		for field, value := range filters {
