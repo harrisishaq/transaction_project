@@ -69,7 +69,7 @@ func (svc *categoryService) DeleteCategory(id string) error {
 	return nil
 }
 
-func (svc *categoryService) GetUser(id string) (*model.DataCategoryResponse, error) {
+func (svc *categoryService) GetCategory(id string) (*model.DataCategoryResponse, error) {
 	dataCategory, err := svc.repoCategory.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
