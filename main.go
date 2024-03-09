@@ -33,12 +33,15 @@ func main() {
 
 	// setup repositories
 	usersRepo := repository.NewUserRepository(dbInit)
+	categoryRepo := repository.NewCategoryRepository(dbInit)
 
 	// setup services
 	usersService := service.NewUserService(usersRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
 
 	// setup controller
 	usersController := controller.NewUserController(usersService)
+	categoryController := controller.NewCategoryController(categoryService)
 
 	// migrate database
 	migrate := gormigrate.New(dbInit, gormigrate.DefaultOptions, []*gormigrate.Migration{
@@ -100,6 +103,7 @@ func main() {
 	}
 
 	usersController.UserRoutes(e)
+	categoryController.CategoryRoutes(e)
 
 	e.Logger.Fatal(e.Start(":3003"))
 }
