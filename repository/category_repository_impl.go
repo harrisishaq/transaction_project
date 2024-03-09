@@ -2,7 +2,10 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"reflect"
+	"strings"
 	"test_project/entity"
 
 	"gorm.io/gorm"
@@ -63,7 +66,7 @@ func (repo *categoryRepository) Get(id string) (*entity.Category, error) {
 	return &result, nil
 }
 
-func (repo *categoryRepository) List(limit, offset int) ([]entity.Category, int64, error) {
+func (repo *categoryRepository) List(limit, offset int, filters map[string]interface{}) ([]entity.Category, int64, error) {
 	var results []entity.Category
 	var tx = repo.DB.Model(&entity.Category{})
 	tx.Order("id asc")
@@ -73,18 +76,77 @@ func (repo *categoryRepository) List(limit, offset int) ([]entity.Category, int6
 		tx.Offset(offset)
 	}
 
+	if len(filters) > 0 {
+		for field, value := range filters {
+			// avoid sql injection in column name
+			var checkField = strings.Split(field, " ")
+			if len(checkField) > 1 {
+				field = checkField[0]
+			}
+
+			switch reflect.TypeOf(value).Kind() {
+			case reflect.Float64, reflect.Int, reflect.Int64:
+				tx.Where(fmt.Sprintf("%s = ?", field), value)
+			case reflect.Slice:
+				tx.Where(fmt.Sprintf("%s IN (?)", field), value)
+			default:
+				tx.Where(fmt.Sprintf("%s LIKE ?", field), "%"+value.(string)+"%")
+			}
+		}
+	}
+
 	err := tx.Find(&results).Error
 	if err != nil {
 		return make([]entity.Category, 0), 0, err
 	}
 
-	var total int64
-	err = tx.Count(&total).Error
+	total, err := repo.listCount(&entity.Category{}, filters)
 	if err != nil {
 		return make([]entity.Category, 0), 0, err
 	}
 
 	return results, total, nil
+}
+
+func (repo *categoryRepository) listCount(model interface{}, filters map[string]interface{}, condition ...interface{}) (int64, error) {
+	var results []entity.Category
+	var tx = repo.DB.Model(&model)
+
+	if len(filters) > 0 {
+		for field, value := range filters {
+			// avoid sql injection in column name
+			var checkField = strings.Split(field, " ")
+			if len(checkField) > 1 {
+				field = checkField[0]
+			}
+
+			switch reflect.TypeOf(value).Kind() {
+			case reflect.Float64, reflect.Int, reflect.Int64:
+				tx.Where(fmt.Sprintf("%s = ?", field), value)
+			case reflect.Slice:
+				tx.Where(fmt.Sprintf("%s IN (?)", field), value)
+			default:
+				tx.Where(fmt.Sprintf("%s LIKE ?", field), "%"+value.(string)+"%")
+			}
+		}
+	}
+
+	if len(condition) > 0 {
+		tx.Where(condition[0], condition[1:]...)
+	}
+
+	err := tx.Find(&results).Error
+	if err != nil {
+		return 0, err
+	}
+
+	var total int64
+	err = tx.Count(&total).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
 }
 
 func (repo *categoryRepository) Update(model *entity.Category) error {
