@@ -24,6 +24,7 @@ func (controller *userController) UserRoutes(e *echo.Echo) {
 	var userRoute = e.Group("/users")
 	userRoute.POST("/", controller.CreateUser)
 	userRoute.POST("/list", controller.ListUsers)
+	userRoute.POST("/login", controller.Login)
 	userRoute.DELETE("/:id", controller.DeleteUser)
 	userRoute.GET("/:id", controller.GetUser)
 	userRoute.PUT("/:id", controller.UpdateUser)
@@ -91,6 +92,22 @@ func (ctrl *userController) ListUsers(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.NewJsonResponse(true).List(data, total))
+}
+
+func (ctrl *userController) Login(c echo.Context) error {
+	request := new(model.LoginUserRequest)
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
+	} else if err := c.Validate(request); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
+	}
+
+	token, err := ctrl.service.LoginUser(request)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
+	}
+
+	return c.JSON(http.StatusOK, model.NewJsonResponse(true).SetData(token))
 }
 
 func (ctrl *userController) UpdateUser(c echo.Context) error {

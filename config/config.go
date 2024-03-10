@@ -14,6 +14,9 @@ var configStruct = map[string]interface{}{
 type EnvAppConfig struct {
 	DefaultPassword string `mapstructure:"DEFAULT_PASSWORD" validate:"required"`
 	DefaultEmail    string `mapstructure:"DEFAULT_EMAIL" validate:"required"`
+	Auth0Secret     string `mapstructure:"AUTH0_SECRET" validate:"required"`
+	Auth0Domain     string `mapstructure:"AUTH0_DOMAIN" validate:"required"`
+	Auth0Audience   string `mapstructure:"AUTH0_AUDIENCE" validate:"required"`
 }
 
 var AppConfig EnvAppConfig

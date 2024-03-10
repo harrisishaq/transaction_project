@@ -1,13 +1,16 @@
 package service
 
 import (
+	"encoding/hex"
 	"fmt"
 	"log"
+	"test_project/config"
 	"test_project/entity"
 	"test_project/model"
 	"test_project/repository"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,8 +19,18 @@ type userService struct {
 	repoUser repository.UserRepository
 }
 
+type Claims struct {
+	UserID string `json:"user_id"`
+	jwt.StandardClaims
+}
+
 func NewUserService(repoUser repository.UserRepository) UserService {
 	return &userService{repoUser}
+}
+
+func (svc *userService) CheckPassword(hashedPassword, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }
 
 func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
@@ -85,6 +98,23 @@ func (svc *userService) DeleteUser(id string) error {
 	return nil
 }
 
+func (svc *userService) GenerateTokenAndSession(dataUser entity.User) (string, error) {
+	claims := Claims{
+		UserID: dataUser.ID.String(),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: jwt.TimeFunc().Add(time.Hour * 24).Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(config.AppConfig.Auth0Secret))
+	if err != nil {
+		log.Println("Error failed to generate JWT token, cause: ", err)
+		return "", model.NewError("500", "Internal server error.")
+	}
+
+	return signedToken, nil
+}
+
 func (svc *userService) GetUser(id string) (*model.DataUserResponse, error) {
 	dataUser, err := svc.repoUser.Get(id)
 	if err != nil {
@@ -132,6 +162,38 @@ func (svc *userService) ListUser(req model.ListUserRequest) ([]model.DataUserRes
 	}
 
 	return respData, total, nil
+}
+
+func (svc *userService) LoginUser(req *model.LoginUserRequest) (string, error) {
+	dataUser, err := svc.repoUser.GetByEmail(req.Email)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return "", model.NewError("500", "Internal server error.")
+	} else if dataUser == nil {
+		return "", model.NewError("404", "Data not found.")
+	}
+
+	decodedBytes, _ := hex.DecodeString(dataUser.Password)
+	passMatch := svc.CheckPassword(string(decodedBytes), req.Password)
+	if !passMatch {
+		return "", model.NewError("401", "Wrong Password")
+	}
+
+	token, err := svc.GenerateTokenAndSession(*dataUser)
+	if err != nil {
+		return "", err
+	}
+
+	timeNow := time.Now()
+	dataUser.LastLoginDate = &timeNow
+
+	err = svc.repoUser.Update(dataUser)
+	if err != nil {
+		log.Println("Error while update data user, cause: ", err)
+		return "", model.NewError("500", "Internal server error.")
+	}
+
+	return token, nil
 }
 
 func (service *userService) saveLog(data *entity.User) (err error) {
