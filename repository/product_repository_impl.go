@@ -100,7 +100,7 @@ func (repo *productRepository) List(limit, offset int, filters map[string]interf
 		}
 	}
 
-	err := tx.Find(&results).Error
+	err := tx.Preload("Category").Find(&results).Error
 	if err != nil {
 		return make([]entity.Product, 0), 0, err
 	}
