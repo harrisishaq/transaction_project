@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"test_project/model"
 	"test_project/service"
@@ -95,15 +96,16 @@ func (ctrl *productController) ListProduct(c echo.Context) error {
 
 func (ctrl *productController) UpdateProduct(c echo.Context) error {
 	id := c.Param("id")
-
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
 	request := new(model.UpdateProductRequest)
 	if err := c.Bind(&request); err != nil {
+		log.Println("Error:  ", err)
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	} else if err := c.Validate(request); err != nil {
+		log.Println("Error:  ", err)
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
 	}
 
