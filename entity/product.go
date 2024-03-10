@@ -22,6 +22,5 @@ type ProductLog struct {
 	Description string
 	IsActive    bool
 	CategoryID  uuid.UUID
-	Category    interface{} `gorm:"type:json"`
-	Audit       *Audit      `gorm:"type:json;serializer:json;default:null"`
+	Audit       *Audit `gorm:"type:json;serializer:json;default:null"`
 }

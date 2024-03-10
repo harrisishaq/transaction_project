@@ -155,7 +155,6 @@ func (service *productService) saveLog(data *entity.Product) (err error) {
 		Price:       data.Price,
 		Description: data.Description,
 		CategoryID:  data.CategoryID,
-		Category:    data.Category,
 		IsActive:    true,
 		Audit:       data.Audit,
 	}

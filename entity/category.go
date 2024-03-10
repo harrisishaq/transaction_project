@@ -14,6 +14,5 @@ type CategoryLog struct {
 	ID       string `gorm:"size:50"`
 	Name     string
 	IsActive bool
-	Products interface{} `gorm:"type:json"`
-	Audit    *Audit      `gorm:"type:json;serializer:json;default:null"`
+	Audit    *Audit `gorm:"type:json;serializer:json;default:null"`
 }

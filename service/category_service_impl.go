@@ -125,7 +125,6 @@ func (service *categoryService) saveLog(data *entity.Category) (err error) {
 		ID:       fmt.Sprintf("%s-%d", data.ID.String(), data.Audit.CurrNo),
 		Name:     data.Name,
 		IsActive: data.IsActive,
-		Products: data.Products,
 		Audit:    data.Audit,
 	}
 
