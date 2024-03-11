@@ -19,11 +19,6 @@ type userService struct {
 	repoUser repository.UserRepository
 }
 
-type Claims struct {
-	UserID string `json:"user_id"`
-	jwt.StandardClaims
-}
-
 func NewUserService(repoUser repository.UserRepository) UserService {
 	return &userService{repoUser}
 }
@@ -99,16 +94,26 @@ func (svc *userService) DeleteUser(id string) error {
 }
 
 func (svc *userService) GenerateTokenAndSession(dataUser entity.User) (string, error) {
-	claims := Claims{
-		UserID: dataUser.ID.String(),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.TimeFunc().Add(time.Hour * 24).Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(config.AppConfig.Auth0Secret))
+	// claims := model.Claims{
+	// 	UserID: dataUser.ID.String(),
+	// 	StandardClaims: jwt.StandardClaims{
+	// 		ExpiresAt: jwt.TimeFunc().Add(time.Hour * 24).Unix(),
+	// 	},
+	// }
+	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// signedToken, err := token.SignedString([]byte(config.AppConfig.Auth0Secret))
+	// if err != nil {
+	// 	log.Println("Error failed to generate JWT token, cause: ", err)
+	// 	return "", model.NewError("500", "Internal server error.")
+	// }
+
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["sub"] = dataUser.ID.String()
+	claims["exp"] = time.Now().Add(time.Hour * 6).Unix() // Expires in 24 hours
+	signedToken, err := token.SignedString([]byte(config.AppConfig.JWTSecret))
 	if err != nil {
-		log.Println("Error failed to generate JWT token, cause: ", err)
+		log.Println("Error when generate JWT Token, cause: ", err)
 		return "", model.NewError("500", "Internal server error.")
 	}
 
