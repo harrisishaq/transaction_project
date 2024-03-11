@@ -35,16 +35,19 @@ func main() {
 	usersRepo := repository.NewUserRepository(dbInit)
 	categoryRepo := repository.NewCategoryRepository(dbInit)
 	productRepo := repository.NewProductRepository(dbInit)
+	customerRepo := repository.NewCustomerRepository(dbInit)
 
 	// setup services
 	usersService := service.NewUserService(usersRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	productService := service.NewProductService(categoryRepo, productRepo)
+	customerService := service.NewCustomerService(customerRepo)
 
 	// setup controller
 	usersController := controller.NewUserController(usersService)
 	categoryController := controller.NewCategoryController(categoryService)
 	productcontroller := controller.NewProductController(productService)
+	customerController := controller.NewCustomerController(customerService)
 
 	// migrate database
 	migrate := gormigrate.New(dbInit, gormigrate.DefaultOptions, []*gormigrate.Migration{
@@ -112,6 +115,7 @@ func main() {
 	usersController.UserRoutes(e)
 	categoryController.CategoryRoutes(e)
 	productcontroller.ProductRoutes(e)
+	customerController.CustomerRoutes(e)
 
 	e.Logger.Fatal(e.Start(":3003"))
 }
