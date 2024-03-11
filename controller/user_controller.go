@@ -39,7 +39,8 @@ func (ctrl *userController) CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
 	}
 
-	err := ctrl.service.CreateUser(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.CreateUser(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -54,7 +55,8 @@ func (ctrl *userController) DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	err := ctrl.service.DeleteUser(id)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.DeleteUser(ctx, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -126,7 +128,8 @@ func (ctrl *userController) UpdateUser(c echo.Context) error {
 	}
 
 	request.ID = id
-	err := ctrl.service.UpdateUser(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.UpdateUser(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}

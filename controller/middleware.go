@@ -94,6 +94,23 @@ func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) ech
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Unauthorized"))
 		}
 
+		// Set UserCtx
+		var userCtx = model.UserContext{
+			UserID:  sub,
+			Name:    dataUser.Name,
+			Token:   tokenData,
+			Email:   dataUser.Email,
+			IsAdmin: true,
+		}
+
+		if dataUser.Email == config.AppConfig.DefaultEmail {
+			userCtx.Username = "SUPER ADMIN"
+		} else {
+			userCtx.Username = dataUser.Email
+		}
+
+		c.Set("userCtx", userCtx)
+
 		return next(c)
 	}
 }

@@ -58,6 +58,8 @@ func main() {
 					&entity.CategoryLog{},
 					&entity.Product{},
 					&entity.ProductLog{},
+					&entity.Customer{},
+					&entity.CustomerLog{},
 				); err != nil {
 					return err
 				}
@@ -94,7 +96,9 @@ func main() {
 					&entity.Category{},
 					&entity.CategoryLog{},
 					&entity.Product{},
-					&entity.ProductLog{})
+					&entity.ProductLog{},
+					&entity.Customer{},
+					&entity.CustomerLog{})
 			},
 		},
 	})

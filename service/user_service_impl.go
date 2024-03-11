@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -29,7 +30,14 @@ func (svc *userService) CheckPassword(hashedPassword, password string) bool {
 	return err == nil
 }
 
-func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
+func (svc *userService) CreateUser(ctx context.Context, req *model.CreateUserRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	dataExist, err := svc.repoUser.GetByEmail(req.Email)
 	if err != nil {
 		log.Println("Error while check email, cause: ", err)
@@ -54,7 +62,7 @@ func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
 		Audit: &entity.Audit{
 			CurrNo:    1,
 			CreatedAt: &timeNow,
-			CreatedBy: "SYSTEM",
+			CreatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 
@@ -67,7 +75,16 @@ func (svc *userService) CreateUser(req *model.CreateUserRequest) error {
 	return nil
 }
 
-func (svc *userService) DeleteUser(id string) error {
+func (svc *userService) DeleteUser(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if userCtx.Username != "SUPER ADMIN" {
+		return model.NewError("401", "Forbidden")
+	}
+
 	oldData, err := svc.repoUser.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -247,7 +264,16 @@ func (svc *userService) UpdateSesionUser(req *model.UpdateSessionUserRequest) er
 	return nil
 }
 
-func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {
+func (svc *userService) UpdateUser(ctx context.Context, req *model.UpdateUserRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if userCtx.Username != "SUPER ADMIN" && userCtx.UserID != req.ID {
+		return model.NewError("401", "Forbidden")
+	}
+
 	oldData, err := svc.repoUser.Get(req.ID)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -287,7 +313,7 @@ func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {
 			CreatedAt: oldData.Audit.CreatedAt,
 			CreatedBy: oldData.Audit.CreatedBy,
 			UpdatedAt: &timeNow,
-			UpdatedBy: req.ID,
+			UpdatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 

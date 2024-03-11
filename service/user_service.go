@@ -1,19 +1,20 @@
 package service
 
 import (
+	"context"
 	"test_project/entity"
 	"test_project/model"
 )
 
 type (
 	UserService interface {
-		CreateUser(req *model.CreateUserRequest) error
-		DeleteUser(id string) error
+		CreateUser(ctx context.Context, req *model.CreateUserRequest) error
+		DeleteUser(ctx context.Context, id string) error
 		GenerateTokenAndSession(dataUser entity.User) (string, error)
 		GetUser(id string) (*model.DataUserResponse, error)
 		ListUser(req model.ListUserRequest) ([]model.DataUserResponse, int64, error)
 		LoginUser(req *model.LoginUserRequest) (string, error)
 		UpdateSesionUser(req *model.UpdateSessionUserRequest) error
-		UpdateUser(req *model.UpdateUserRequest) error
+		UpdateUser(ctx context.Context, req *model.UpdateUserRequest) error
 	}
 )
