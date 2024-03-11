@@ -11,6 +11,7 @@ type UserContext struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Token    string `json:"token"`
+	Session  string `json:"session"`
 	IsAdmin  bool
 }
 

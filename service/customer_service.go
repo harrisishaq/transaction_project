@@ -14,5 +14,6 @@ type (
 		ListCustomer(req model.ListCustomerRequest) ([]model.DataCustomerResponse, int64, error)
 		LoginCustomer(req *model.LoginCustomerRequest) (string, error)
 		UpdateCustomer(req *model.UpdateCustomerRequest) error
+		UpdateSesion(req *model.UpdateSessionCustomerRequest) error
 	}
 )

@@ -45,7 +45,7 @@ func main() {
 
 	// setup controller
 	usersController := controller.NewUserController(usersService)
-	categoryController := controller.NewCategoryController(categoryService)
+	categoryController := controller.NewCategoryController(categoryService, usersService)
 	productcontroller := controller.NewProductController(productService)
 	customerController := controller.NewCustomerController(customerService)
 

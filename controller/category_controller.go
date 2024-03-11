@@ -10,11 +10,17 @@ import (
 )
 
 type categoryController struct {
-	service service.CategoryService
+	Service     service.CategoryService
+	UserService service.UserService
+	CustService service.CustomerService
 }
 
-func NewCategoryController(service service.CategoryService) *categoryController {
-	return &categoryController{service}
+func NewCategoryController(service service.CategoryService, userService service.UserService, custService service.CustomerService) *categoryController {
+	return &categoryController{
+		Service:     service,
+		UserService: userService,
+		CustService: custService,
+	}
 }
 
 func (controller *categoryController) CategoryRoutes(e *echo.Echo) {
@@ -22,11 +28,11 @@ func (controller *categoryController) CategoryRoutes(e *echo.Echo) {
 
 	// Category EP
 	var categoryRoute = e.Group("/categories")
-	categoryRoute.POST("/", controller.CreateCategory)
-	categoryRoute.POST("/list", controller.ListCategory)
-	categoryRoute.DELETE("/:id", controller.DeleteCategory)
-	categoryRoute.GET("/:id", controller.GetCategory)
-	categoryRoute.PUT("/:id", controller.UpdateCategory)
+	categoryRoute.POST("/", controller.CreateCategory, controller.middlewareCheckAuthAdmin)
+	categoryRoute.POST("/list", controller.ListCategory, controller.middlewareCheckAuth)
+	categoryRoute.DELETE("/:id", controller.DeleteCategory, controller.middlewareCheckAuthAdmin)
+	categoryRoute.GET("/:id", controller.GetCategory, controller.middlewareCheckAuthAdmin)
+	categoryRoute.PUT("/:id", controller.UpdateCategory, controller.middlewareCheckAuthAdmin)
 }
 
 func (ctrl *categoryController) CreateCategory(c echo.Context) error {
@@ -37,7 +43,8 @@ func (ctrl *categoryController) CreateCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
 	}
 
-	err := ctrl.service.CreateCategory(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.Service.CreateCategory(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -52,7 +59,8 @@ func (ctrl *categoryController) DeleteCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	err := ctrl.service.DeleteCategory(id)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.Service.DeleteCategory(ctx, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -67,7 +75,7 @@ func (ctrl *categoryController) GetCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	data, err := ctrl.service.GetCategory(id)
+	data, err := ctrl.Service.GetCategory(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -85,7 +93,7 @@ func (ctrl *categoryController) ListCategory(c echo.Context) error {
 		request.Filter = make(map[string]interface{})
 	}
 
-	data, total, err := ctrl.service.ListCategory(*request)
+	data, total, err := ctrl.Service.ListCategory(*request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -108,7 +116,8 @@ func (ctrl *categoryController) UpdateCategory(c echo.Context) error {
 	}
 
 	request.ID = id
-	err := ctrl.service.UpdateCategory(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.Service.UpdateCategory(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}

@@ -284,3 +284,23 @@ func (svc *customerService) UpdateCustomer(req *model.UpdateCustomerRequest) err
 
 	return nil
 }
+
+func (svc *customerService) UpdateSesion(req *model.UpdateSessionCustomerRequest) error {
+	oldData, err := svc.repoCustomer.Get(req.ID)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	} else if oldData == nil {
+		return model.NewError("400", "Data not found.")
+	}
+
+	oldData.Session = req.Session
+
+	err = svc.repoCustomer.Update(oldData)
+	if err != nil {
+		log.Println("Error while update data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	}
+
+	return nil
+}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"test_project/entity"
@@ -19,7 +20,14 @@ func NewCategoryService(repoCategory repository.CategoryRepository) CategoryServ
 	return &categoryService{repoCategory}
 }
 
-func (svc *categoryService) CreateCategory(req *model.CreateCategoryRequest) error {
+func (svc *categoryService) CreateCategory(ctx context.Context, req *model.CreateCategoryRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	timeNow := time.Now()
 
 	var newData = &entity.Category{
@@ -29,7 +37,7 @@ func (svc *categoryService) CreateCategory(req *model.CreateCategoryRequest) err
 		Audit: &entity.Audit{
 			CurrNo:    1,
 			CreatedAt: &timeNow,
-			CreatedBy: "SYSTEM",
+			CreatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 
@@ -42,7 +50,14 @@ func (svc *categoryService) CreateCategory(req *model.CreateCategoryRequest) err
 	return nil
 }
 
-func (svc *categoryService) DeleteCategory(id string) error {
+func (svc *categoryService) DeleteCategory(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	oldData, err := svc.repoCategory.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -51,7 +66,7 @@ func (svc *categoryService) DeleteCategory(id string) error {
 		return model.NewError("404", "Data not found.")
 	}
 
-	logReason := fmt.Sprintf("Data dihapus oleh %v", id)
+	logReason := fmt.Sprintf("Data dihapus oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -137,7 +152,14 @@ func (service *categoryService) saveLog(data *entity.Category) (err error) {
 	return
 }
 
-func (svc *categoryService) UpdateCategory(req *model.UpdateCategoryRequest) error {
+func (svc *categoryService) UpdateCategory(ctx context.Context, req *model.UpdateCategoryRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	oldData, err := svc.repoCategory.Get(req.ID)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -146,7 +168,7 @@ func (svc *categoryService) UpdateCategory(req *model.UpdateCategoryRequest) err
 		return model.NewError("400", "Data not found.")
 	}
 
-	logReason := fmt.Sprintf("Perubahan data oleh %v", req.ID)
+	logReason := fmt.Sprintf("Perubahan data oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -166,7 +188,7 @@ func (svc *categoryService) UpdateCategory(req *model.UpdateCategoryRequest) err
 			CreatedAt: oldData.Audit.CreatedAt,
 			CreatedBy: oldData.Audit.CreatedBy,
 			UpdatedAt: &timeNow,
-			UpdatedBy: req.ID,
+			UpdatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 
