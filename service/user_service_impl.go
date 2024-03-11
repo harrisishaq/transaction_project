@@ -135,6 +135,7 @@ func (svc *userService) GetUser(id string) (*model.DataUserResponse, error) {
 		Name:          dataUser.Name,
 		Email:         dataUser.Email,
 		LastLoginDate: dataUser.LastLoginDate,
+		Session:       dataUser.Session,
 	}, nil
 }
 
@@ -224,6 +225,26 @@ func (service *userService) saveLog(data *entity.User) (err error) {
 	}
 
 	return
+}
+
+func (svc *userService) UpdateSesionUser(req *model.UpdateSessionUserRequest) error {
+	oldData, err := svc.repoUser.Get(req.ID)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	} else if oldData == nil {
+		return model.NewError("400", "Data not found.")
+	}
+
+	oldData.Session = req.Session
+
+	err = svc.repoUser.Update(oldData)
+	if err != nil {
+		log.Println("Error while update data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	}
+
+	return nil
 }
 
 func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {

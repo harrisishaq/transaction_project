@@ -13,6 +13,7 @@ type (
 		GetUser(id string) (*model.DataUserResponse, error)
 		ListUser(req model.ListUserRequest) ([]model.DataUserResponse, int64, error)
 		LoginUser(req *model.LoginUserRequest) (string, error)
+		UpdateSesionUser(req *model.UpdateSessionUserRequest) error
 		UpdateUser(req *model.UpdateUserRequest) error
 	}
 )

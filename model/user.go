@@ -21,6 +21,11 @@ type (
 		Password string `json:"password" validate:"required"`
 	}
 
+	UpdateSessionUserRequest struct {
+		ID      string `json:"id"`
+		Session string `json:"session"`
+	}
+
 	UpdateUserRequest struct {
 		ID    string `json:"id"`
 		Name  string `json:"name" validate:"required"`
@@ -35,5 +40,6 @@ type (
 		Name          string     `json:"name"`
 		Email         string     `json:"email"`
 		LastLoginDate *time.Time `json:"lastLoginDate"`
+		Session       string     `json:"session"`
 	}
 )

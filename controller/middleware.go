@@ -18,6 +18,7 @@ func Logger(c echo.Context, reqBody, resBody []byte) {
 func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Get Token
+		var userID = c.Request().Header.Get("x-consumer-id")
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Not Authorized"))
@@ -35,6 +36,15 @@ func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) ech
 
 		tokenData := tokenSplit[1]
 
+		dataUser, err := controller.service.GetUser(userID)
+		if err != nil {
+			log.Println("Error Cause: ", err)
+			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("500", "Internal server error"))
+		} else if dataUser == nil {
+			log.Println("user not found")
+			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Unauthorized"))
+		}
+
 		log.Println("Start Verify Token, token: ", tokenString)
 
 		// Verify token signature
@@ -43,8 +53,19 @@ func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) ech
 		})
 		if err != nil || token == nil || !token.Valid {
 			log.Println("Error Cause: ", err)
-			log.Println("Token:", token)
 			log.Println("Token not valid:", !token.Valid)
+
+			if err.Error() == "Token is expired" && dataUser.Session != "" {
+				err = controller.service.UpdateSesionUser(&model.UpdateSessionUserRequest{
+					ID:      dataUser.ID,
+					Session: "",
+				})
+				if err != nil {
+					log.Println("Error Cause: ", err)
+					return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("500", "Internal server error"))
+				}
+			}
+
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Invalid Token"))
 		}
 
@@ -60,10 +81,16 @@ func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) ech
 		if !ok {
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("500", "Internal server error"))
 		}
+
 		// Verify user's identity with your application's authentication system
-		var userID = c.Request().Header.Get("x-consumer-id")
 		if userID != sub {
 			log.Println("user does not match token owner")
+			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Unauthorized"))
+		}
+
+		tokenArr := strings.Split(tokenData, ".")
+		if dataUser.Session != tokenArr[2] {
+			log.Println("user session is ended/logout")
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Unauthorized"))
 		}
 
