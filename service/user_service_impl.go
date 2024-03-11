@@ -93,7 +93,7 @@ func (svc *userService) DeleteUser(ctx context.Context, id string) error {
 		return model.NewError("404", "Data not found.")
 	}
 
-	logReason := fmt.Sprintf("Data dihapus oleh %v", id)
+	logReason := fmt.Sprintf("Data dihapus oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -290,7 +290,7 @@ func (svc *userService) UpdateUser(ctx context.Context, req *model.UpdateUserReq
 		return model.NewError("400", "Email already exist.")
 	}
 
-	logReason := fmt.Sprintf("Perubahan data oleh %v", req.ID)
+	logReason := fmt.Sprintf("Perubahan data oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
