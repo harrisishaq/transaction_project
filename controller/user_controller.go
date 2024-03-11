@@ -23,12 +23,12 @@ func (controller *userController) UserRoutes(e *echo.Echo) {
 	// User EP
 	var userRoute = e.Group("/users")
 	userRoute.Use(middleware.BodyDump(Logger))
-	userRoute.POST("/", controller.CreateUser)
-	userRoute.POST("/list", controller.ListUsers)
+	userRoute.POST("/", controller.CreateUser, controller.middlewareCheckAuth)
+	userRoute.POST("/list", controller.ListUsers, controller.middlewareCheckAuth)
 	userRoute.POST("/login", controller.Login)
-	userRoute.DELETE("/:id", controller.DeleteUser)
+	userRoute.DELETE("/:id", controller.DeleteUser, controller.middlewareCheckAuth)
 	userRoute.GET("/:id", controller.GetUser, controller.middlewareCheckAuth)
-	userRoute.PUT("/:id", controller.UpdateUser)
+	userRoute.PUT("/:id", controller.UpdateUser, controller.middlewareCheckAuth)
 }
 
 func (ctrl *userController) CreateUser(c echo.Context) error {
