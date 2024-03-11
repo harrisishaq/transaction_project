@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"strings"
 	"test_project/config"
 	"test_project/entity"
 	"test_project/model"
@@ -192,6 +193,10 @@ func (svc *userService) LoginUser(req *model.LoginUserRequest) (string, error) {
 	timeNow := time.Now()
 	dataUser.LastLoginDate = &timeNow
 
+	// Split token
+	splitToken := strings.Split(token, ".")
+	dataUser.Session = splitToken[2]
+
 	err = svc.repoUser.Update(dataUser)
 	if err != nil {
 		log.Println("Error while update data user, cause: ", err)
@@ -208,6 +213,7 @@ func (service *userService) saveLog(data *entity.User) (err error) {
 		Email:         data.Email,
 		Password:      data.Password,
 		LastLoginDate: data.LastLoginDate,
+		Session:       data.Session,
 		Audit:         data.Audit,
 	}
 
@@ -254,6 +260,7 @@ func (svc *userService) UpdateUser(req *model.UpdateUserRequest) error {
 		Email:         req.Email,
 		Password:      oldData.Password,
 		LastLoginDate: oldData.LastLoginDate,
+		Session:       oldData.Session,
 		Audit: &entity.Audit{
 			CurrNo:    oldData.Audit.CurrNo + 1,
 			CreatedAt: oldData.Audit.CreatedAt,

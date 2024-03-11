@@ -43,6 +43,8 @@ func (controller *userController) middlewareCheckAuth(next echo.HandlerFunc) ech
 		})
 		if err != nil || token == nil || !token.Valid {
 			log.Println("Error Cause: ", err)
+			log.Println("Token:", token)
+			log.Println("Token not valid:", !token.Valid)
 			return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("401", "Invalid Token"))
 		}
 
