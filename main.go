@@ -46,7 +46,7 @@ func main() {
 	// setup controller
 	usersController := controller.NewUserController(usersService)
 	categoryController := controller.NewCategoryController(categoryService, usersService)
-	productcontroller := controller.NewProductController(productService)
+	productcontroller := controller.NewProductController(productService, usersService)
 	customerController := controller.NewCustomerController(customerService)
 
 	// migrate database

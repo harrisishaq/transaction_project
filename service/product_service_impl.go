@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"test_project/entity"
@@ -23,7 +24,14 @@ func NewProductService(repoCategory repository.CategoryRepository, repoProduct r
 	}
 }
 
-func (svc *productService) CreateProduct(req *model.CreateProductRequest) error {
+func (svc *productService) CreateProduct(ctx context.Context, req *model.CreateProductRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	// Check if category_id is valid or not
 	dataCategory, err := svc.repoCategory.Get(req.CategoryID)
 	if err != nil {
@@ -50,7 +58,7 @@ func (svc *productService) CreateProduct(req *model.CreateProductRequest) error 
 		Audit: &entity.Audit{
 			CurrNo:    1,
 			CreatedAt: &timeNow,
-			CreatedBy: "SYSTEM",
+			CreatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 
@@ -63,7 +71,14 @@ func (svc *productService) CreateProduct(req *model.CreateProductRequest) error 
 	return nil
 }
 
-func (svc *productService) DeleteProduct(id string) error {
+func (svc *productService) DeleteProduct(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	oldData, err := svc.repoProduct.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -72,7 +87,7 @@ func (svc *productService) DeleteProduct(id string) error {
 		return model.NewError("404", "Data not found.")
 	}
 
-	logReason := fmt.Sprintf("Data dihapus oleh %v", id)
+	logReason := fmt.Sprintf("Data dihapus oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -168,7 +183,14 @@ func (service *productService) saveLog(data *entity.Product) (err error) {
 	return
 }
 
-func (svc *productService) UpdateProduct(req *model.UpdateProductRequest) error {
+func (svc *productService) UpdateProduct(ctx context.Context, req *model.UpdateProductRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	oldData, err := svc.repoProduct.Get(req.ID)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -192,7 +214,7 @@ func (svc *productService) UpdateProduct(req *model.UpdateProductRequest) error 
 		}
 	}
 
-	logReason := fmt.Sprintf("Perubahan data oleh %v", req.ID)
+	logReason := fmt.Sprintf("Perubahan data oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -216,7 +238,7 @@ func (svc *productService) UpdateProduct(req *model.UpdateProductRequest) error 
 			CreatedAt: oldData.Audit.CreatedAt,
 			CreatedBy: oldData.Audit.CreatedBy,
 			UpdatedAt: &timeNow,
-			UpdatedBy: "SYSTEM",
+			UpdatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 

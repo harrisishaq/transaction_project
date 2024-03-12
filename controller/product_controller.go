@@ -11,11 +11,15 @@ import (
 )
 
 type productController struct {
-	service service.ProductService
+	service     service.ProductService
+	userService service.UserService
 }
 
-func NewProductController(service service.ProductService) *productController {
-	return &productController{service}
+func NewProductController(service service.ProductService, userService service.UserService) *productController {
+	return &productController{
+		service:     service,
+		userService: userService,
+	}
 }
 
 func (controller *productController) ProductRoutes(e *echo.Echo) {
@@ -23,11 +27,11 @@ func (controller *productController) ProductRoutes(e *echo.Echo) {
 
 	// Product EP
 	var productRoute = e.Group("/products")
-	productRoute.POST("/", controller.CreateProduct)
+	productRoute.POST("/", controller.CreateProduct, controller.middlewareCheckAuthAdmin)
 	productRoute.POST("/list", controller.ListProduct)
-	productRoute.DELETE("/:id", controller.DeleteProduct)
+	productRoute.DELETE("/:id", controller.DeleteProduct, controller.middlewareCheckAuthAdmin)
 	productRoute.GET("/:id", controller.GetProduct)
-	productRoute.PUT("/:id", controller.UpdateProduct)
+	productRoute.PUT("/:id", controller.UpdateProduct, controller.middlewareCheckAuthAdmin)
 }
 
 func (ctrl *productController) CreateProduct(c echo.Context) error {
@@ -38,7 +42,8 @@ func (ctrl *productController) CreateProduct(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
 	}
 
-	err := ctrl.service.CreateProduct(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.CreateProduct(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -53,7 +58,8 @@ func (ctrl *productController) DeleteProduct(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	err := ctrl.service.DeleteProduct(id)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.DeleteProduct(ctx, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -110,7 +116,8 @@ func (ctrl *productController) UpdateProduct(c echo.Context) error {
 	}
 
 	request.ID = id
-	err := ctrl.service.UpdateProduct(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.UpdateProduct(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
