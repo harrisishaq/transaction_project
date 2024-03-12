@@ -29,7 +29,7 @@ func (controller *categoryController) CategoryRoutes(e *echo.Echo) {
 	// Category EP
 	var categoryRoute = e.Group("/categories")
 	categoryRoute.POST("/", controller.CreateCategory, controller.middlewareCheckAuthAdmin)
-	categoryRoute.POST("/list", controller.ListCategory, controller.middlewareCheckAuth)
+	categoryRoute.POST("/list", controller.ListCategory)
 	categoryRoute.DELETE("/:id", controller.DeleteCategory, controller.middlewareCheckAuthAdmin)
 	categoryRoute.GET("/:id", controller.GetCategory, controller.middlewareCheckAuthAdmin)
 	categoryRoute.PUT("/:id", controller.UpdateCategory, controller.middlewareCheckAuthAdmin)
