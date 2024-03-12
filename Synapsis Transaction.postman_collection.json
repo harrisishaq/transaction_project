@@ -1,0 +1,717 @@
+{
+	"info": {
+		"_postman_id": "9615a0e8-6e13-4beb-b1fa-d3f996292717",
+		"name": "Synapsis Transaction",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17731087"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMTYxOTYsInN1YiI6ImY5ZTFlZWM5LWUwZmUtNGMyMC1iNWZmLWUxOWNjYWM3MWViMCJ9.sk75OifoKyIEqDBVUuggZP9bCCzhTleUZQRh5weLB1c",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "f9e1eec9-e0fe-4c20-b5ff-e19ccac71eb0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Harris Ishaq\",\r\n    \"email\": \"harris@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/users/",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMjY1NTQsInN1YiI6IjdjYjEzMDU4LWVhNDItNDE2Mi1iNDQ3LTQxYjA5NTEwZjJjNCJ9.ZDbCvbdL4OlsnLAwSVUDilI85DdhK36h8FZozndX9K8",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "7cb13058-ea42-4162-b447-41b09510f2c4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/users/7cb13058-ea42-4162-b447-41b09510f2c4",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"7cb13058-ea42-4162-b447-41b09510f2c4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-consumer-id",
+								"value": "f9e1eec9-e0fe-4c20-b5ff-e19ccac71eb0",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMTYxOTYsInN1YiI6ImY5ZTFlZWM5LWUwZmUtNGMyMC1iNWZmLWUxOWNjYWM3MWViMCJ9.sk75OifoKyIEqDBVUuggZP9bCCzhTleUZQRh5weLB1c",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/users/list",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"list"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMTY5MDAsInN1YiI6IjIzMGEzMmE0LTU2Y2ItNGQyNi1hYTczLTc3N2FlMTA4ODgzYSJ9.9-MGlit7pRvgrjr5jzhf4c_XmpIjTZ9xP5lUT_28508",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "230a32a4-56cb-4d26-aa73-777ae108883a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Harris Ishaq Test\",\r\n    \"email\": \"harris1@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/users/f9e1eec9-e0fe-4c20-b5ff-e19ccac71eb0",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"f9e1eec9-e0fe-4c20-b5ff-e19ccac71eb0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-consumer-id",
+								"value": "230a32a4-56cb-4d26-aa73-777ae108883a",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMTY5MDAsInN1YiI6IjIzMGEzMmE0LTU2Y2ItNGQyNi1hYTczLTc3N2FlMTA4ODgzYSJ9.9-MGlit7pRvgrjr5jzhf4c_XmpIjTZ9xP5lUT_28508",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/users/7bdef2c3-6694-448c-a45b-bcd7dea42ede",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"7bdef2c3-6694-448c-a45b-bcd7dea42ede"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"harris.for.work@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/users/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMzA3MzAsInN1YiI6IjdjYjEzMDU4LWVhNDItNDE2Mi1iNDQ3LTQxYjA5NTEwZjJjNCJ9.RsTpUEuaO0gZFSPhNsFE7A-Ity8SZlgbEl1fMK7e1kQ",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "7cb13058-ea42-4162-b447-41b09510f2c4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/users/logout/7cb13058-ea42-4162-b447-41b09510f2c4",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"users",
+								"logout",
+								"7cb13058-ea42-4162-b447-41b09510f2c4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNDM1NzUsInN1YiI6ImRlYmMzODQ2LWJmMWEtNGIwZC04N2QwLTQ5NzBlNmJjOWUyNCJ9.xo1gPCVQ_gx0nyDNNbFx-3jRo3pzFXhtzi0GpF3D-dM",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "debc3846-bf1a-4b0d-87d0-4970e6bc9e24",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Peralatan Dapur\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/categories/",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"categories",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:3003/categories/list",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"categories",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3003/categories/619f2adc-0056-49b3-858f-f643df3e21d9",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"categories",
+								"619f2adc-0056-49b3-858f-f643df3e21d9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Peralatan Kamar\",\r\n    \"isActive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/categories/61ea5a7e-9bec-421a-9d15-af808ffe87f1",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"categories",
+								"61ea5a7e-9bec-421a-9d15-af808ffe87f1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMjY1NTQsInN1YiI6IjdjYjEzMDU4LWVhNDItNDE2Mi1iNDQ3LTQxYjA5NTEwZjJjNCJ9.ZDbCvbdL4OlsnLAwSVUDilI85DdhK36h8FZozndX9K8",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "7cb13058-ea42-4162-b447-41b09510f2c4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/categories/3472c78f-c74c-4a26-87bc-e4f1abd739ce",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"categories",
+								"3472c78f-c74c-4a26-87bc-e4f1abd739ce"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-consumer-id",
+								"value": "debc3846-bf1a-4b0d-87d0-4970e6bc9e24",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNDM1NzUsInN1YiI6ImRlYmMzODQ2LWJmMWEtNGIwZC04N2QwLTQ5NzBlNmJjOWUyNCJ9.xo1gPCVQ_gx0nyDNNbFx-3jRo3pzFXhtzi0GpF3D-dM",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"categoryId\": \"4f227752-c7ad-427e-8574-a93582ed6b0e\",\r\n    \"name\": \"Gayung\",\r\n    \"qty\": 1,\r\n    \"price\": 2500,\r\n    \"description\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/products/",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3003/products/d6991bd5-15f6-42b6-beb4-1e53d4f7763e",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"products",
+								"d6991bd5-15f6-42b6-beb4-1e53d4f7763e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filters\": {\r\n        \"is_active\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/products/list",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"products",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"categoryId\": \"61ea5a7e-9bec-421a-9d15-af808ffe87f1\",\r\n    \"name\": \"Shampoo Anak\",\r\n    \"qty\": 2,\r\n    \"price\": 15000,\r\n    \"description\": \"\",\r\n    \"isActive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/products/d6991bd5-15f6-42b6-beb4-1e53d4f7763e",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"products",
+								"d6991bd5-15f6-42b6-beb4-1e53d4f7763e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3003/products/d6991bd5-15f6-42b6-beb4-1e53d4f7763e",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"products",
+								"d6991bd5-15f6-42b6-beb4-1e53d4f7763e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Create Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-consumer-id",
+								"value": "7cb13058-ea42-4162-b447-41b09510f2c4",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMjY1NTQsInN1YiI6IjdjYjEzMDU4LWVhNDItNDE2Mi1iNDQ3LTQxYjA5NTEwZjJjNCJ9.ZDbCvbdL4OlsnLAwSVUDilI85DdhK36h8FZozndX9K8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Harris Ishaq\",\r\n    \"email\": \"harris.cust@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"username\": \"harriscust\",\r\n    \"phone\": \"081351359343\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/customers/",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"customers",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Customer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Harris Ishaq\",\r\n    \"email\": \"harris.cust2@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"username\": \"harriscust2\",\r\n    \"phone\": \"081351359343\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/customers/register",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"customers",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Customer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"\",\r\n    \"email\":\"harris.cust2@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/customers/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"customers",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-consumer-id",
+								"value": "23e0c0a3-56af-44d7-ba0f-d4ea3c4d8899",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMzA0MDcsInN1YiI6IjIzZTBjMGEzLTU2YWYtNDRkNy1iYTBmLWQ0ZWEzYzRkODg5OSJ9.AmtsLj459QKbvgy8cMyd61HjlzA_OshThi5up_jJV9M",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3003/customers/logout/23e0c0a3-56af-44d7-ba0f-d4ea3c4d8899",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"customers",
+								"logout",
+								"23e0c0a3-56af-44d7-ba0f-d4ea3c4d8899"
+							],
+							"query": [
+								{
+									"key": "x-consumer-id",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carts",
+			"item": [
+				{
+					"name": "Add Item Carts",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNDM4NjksInN1YiI6IjUxODVjNTMwLTNjY2QtNDIyYy1iNDdjLTc3MWMyZDRiNzM3YyJ9.R-WrtWFklYb0-H45FKrq3vcvNYOG_uS27228Ym8BjwE",
+								"type": "text"
+							},
+							{
+								"key": "x-consumer-id",
+								"value": "5185c530-3ccd-422c-b47c-771c2d4b737c",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\": \"e62b1c4d-9e31-493e-9fdd-587ab133fd9c\",\r\n    \"qty\": 1,\r\n    \"notes\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3003/carts/add",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"carts",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Carts",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

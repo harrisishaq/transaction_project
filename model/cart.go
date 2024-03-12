@@ -3,7 +3,7 @@ package model
 type (
 	AddItemCartRequest struct {
 		ProductID string `json:"product_id" validate:"required"`
-		Qty       int    `json:"qty" validate:"min:1"`
+		Qty       int    `json:"qty"`
 		Notes     string `json:"notes"`
 	}
 )
