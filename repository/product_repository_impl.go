@@ -57,7 +57,7 @@ func (repo *productRepository) Delete(model *entity.Product) error {
 
 func (repo *productRepository) Get(id string) (*entity.Product, error) {
 	var result entity.Product
-	qResult := repo.DB.Preload("Category").First(&result, "id = ?", id)
+	qResult := repo.DB.Preload("Category").Unscoped().First(&result, "id = ?", id)
 	if errors.Is(qResult.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	} else if qResult.Error != nil {
@@ -100,7 +100,7 @@ func (repo *productRepository) List(limit, offset int, filters map[string]interf
 		}
 	}
 
-	err := tx.Preload("Category").Find(&results).Error
+	err := tx.Preload("Category").Unscoped().Find(&results).Error
 	if err != nil {
 		return make([]entity.Product, 0), 0, err
 	}

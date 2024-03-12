@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Product struct {
 	ID          uuid.UUID `gorm:"primaryKey;type:varchar(36)"`
@@ -10,8 +13,9 @@ type Product struct {
 	Description string
 	IsActive    bool
 	CategoryID  uuid.UUID
-	Category    Category `gorm:"foreignKey:CategoryID"`
-	Audit       *Audit   `gorm:"type:json;serializer:json;default:null"`
+	Category    Category       `gorm:"foreignKey:CategoryID"`
+	Audit       *Audit         `gorm:"type:json;serializer:json;default:null"`
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
 
 type ProductLog struct {
@@ -22,5 +26,6 @@ type ProductLog struct {
 	Description string
 	IsActive    bool
 	CategoryID  uuid.UUID
-	Audit       *Audit `gorm:"type:json;serializer:json;default:null"`
+	Audit       *Audit      `gorm:"type:json;serializer:json;default:null"`
+	DeletedAt   interface{} `gorm:"type:json"`
 }
