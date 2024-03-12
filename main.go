@@ -47,7 +47,7 @@ func main() {
 	usersController := controller.NewUserController(usersService)
 	categoryController := controller.NewCategoryController(categoryService, usersService)
 	productcontroller := controller.NewProductController(productService, usersService)
-	customerController := controller.NewCustomerController(customerService)
+	customerController := controller.NewCustomerController(customerService, usersService)
 
 	// migrate database
 	migrate := gormigrate.New(dbInit, gormigrate.DefaultOptions, []*gormigrate.Migration{

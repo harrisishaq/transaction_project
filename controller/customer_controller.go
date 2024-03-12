@@ -10,11 +10,12 @@ import (
 )
 
 type customerController struct {
-	service service.CustomerService
+	service     service.CustomerService
+	UserService service.UserService
 }
 
-func NewCustomerController(service service.CustomerService) *customerController {
-	return &customerController{service}
+func NewCustomerController(service service.CustomerService, userService service.UserService) *customerController {
+	return &customerController{service, userService}
 }
 
 func (controller *customerController) CustomerRoutes(e *echo.Echo) {
@@ -23,12 +24,13 @@ func (controller *customerController) CustomerRoutes(e *echo.Echo) {
 	// Customer EP
 	var customerRoute = e.Group("/customers")
 	customerRoute.Use(middleware.BodyDump(Logger))
-	customerRoute.POST("/", controller.CreateCustomer)
-	customerRoute.POST("/list", controller.ListCustomers)
+	customerRoute.POST("/register", controller.CreateCustomer)
+	customerRoute.POST("/", controller.CreateCustomer, controller.middlewareCheckAuthAdmin)
+	customerRoute.POST("/list", controller.ListCustomers, controller.middlewareCheckAuthAdmin)
 	customerRoute.POST("/login", controller.Login)
-	customerRoute.DELETE("/:id", controller.DeleteCustomer)
-	customerRoute.GET("/:id", controller.GetCustomer)
-	customerRoute.PUT("/:id", controller.UpdateCustomer)
+	customerRoute.DELETE("/:id", controller.DeleteCustomer, controller.middlewareCheckAuthAdmin)
+	customerRoute.GET("/:id", controller.GetCustomer, controller.middlewareCheckAuth)
+	customerRoute.PUT("/:id", controller.UpdateCustomer, controller.middlewareCheckAuth)
 }
 
 func (ctrl *customerController) CreateCustomer(c echo.Context) error {
@@ -39,7 +41,8 @@ func (ctrl *customerController) CreateCustomer(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
 	}
 
-	err := ctrl.service.CreateCustomer(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.CreateCustomer(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -54,7 +57,8 @@ func (ctrl *customerController) DeleteCustomer(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	err := ctrl.service.DeleteCustomer(id)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.DeleteCustomer(ctx, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -69,7 +73,8 @@ func (ctrl *customerController) GetCustomer(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
-	data, err := ctrl.service.GetCustomer(id)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	data, err := ctrl.service.GetCustomer(ctx, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -87,7 +92,8 @@ func (ctrl *customerController) ListCustomers(c echo.Context) error {
 		request.Filter = make(map[string]interface{})
 	}
 
-	data, total, err := ctrl.service.ListCustomer(*request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	data, total, err := ctrl.service.ListCustomer(ctx, *request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}
@@ -101,6 +107,10 @@ func (ctrl *customerController) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	} else if err := c.Validate(request); err != nil {
 		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", err.Error()))
+	}
+
+	if (request.Email == "" && request.Username == "") || (request.Email != "" && request.Username != "") {
+		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
 	}
 
 	token, err := ctrl.service.LoginCustomer(request)
@@ -126,7 +136,8 @@ func (ctrl *customerController) UpdateCustomer(c echo.Context) error {
 	}
 
 	request.ID = id
-	err := ctrl.service.UpdateCustomer(request)
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.UpdateCustomer(ctx, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
 	}

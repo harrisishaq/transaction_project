@@ -19,7 +19,8 @@ type (
 	}
 
 	LoginCustomerRequest struct {
-		Email    string `json:"email" validate:"required,email"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
 		Password string `json:"password" validate:"required"`
 	}
 

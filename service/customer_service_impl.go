@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -29,7 +30,14 @@ func (svc *customerService) CheckPassword(hashedPassword, password string) bool 
 	return err == nil
 }
 
-func (svc *customerService) CreateCustomer(req *model.CreateCustomerRequest) error {
+func (svc *customerService) CreateCustomer(ctx context.Context, req *model.CreateCustomerRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	}
+
 	dataExist, err := svc.repoCustomer.GetByUsernameOrEmail(req.Username, req.Email)
 	if err != nil {
 		log.Println("Error while existing data, cause: ", err)
@@ -50,6 +58,13 @@ func (svc *customerService) CreateCustomer(req *model.CreateCustomerRequest) err
 
 	timeNow := time.Now()
 
+	var createdBy string
+	if userCtx.UserID != "" {
+		createdBy = fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username)
+	} else {
+		createdBy = "SYSTEM"
+	}
+
 	var newData = &entity.Customer{
 		ID:          uuid.New(),
 		Name:        req.Name,
@@ -60,7 +75,7 @@ func (svc *customerService) CreateCustomer(req *model.CreateCustomerRequest) err
 		Audit: &entity.Audit{
 			CurrNo:    1,
 			CreatedAt: &timeNow,
-			CreatedBy: "SYSTEM",
+			CreatedBy: createdBy,
 		},
 	}
 
@@ -73,7 +88,16 @@ func (svc *customerService) CreateCustomer(req *model.CreateCustomerRequest) err
 	return nil
 }
 
-func (svc *customerService) DeleteCustomer(id string) error {
+func (svc *customerService) DeleteCustomer(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if !userCtx.IsAdmin {
+		return model.NewError("401", "Forbidden.")
+	}
+
 	oldData, err := svc.repoCustomer.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -82,7 +106,7 @@ func (svc *customerService) DeleteCustomer(id string) error {
 		return model.NewError("404", "Data not found.")
 	}
 
-	logReason := fmt.Sprintf("Data dihapus oleh %v", id)
+	logReason := fmt.Sprintf("Data dihapus oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -114,7 +138,16 @@ func (svc *customerService) GenerateTokenAndSession(dataCustomer entity.Customer
 	return signedToken, nil
 }
 
-func (svc *customerService) GetCustomer(id string) (*model.DataCustomerResponse, error) {
+func (svc *customerService) GetCustomer(ctx context.Context, id string) (*model.DataCustomerResponse, error) {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return nil, model.NewError("401", "Invalid login session.")
+	} else if !userCtx.IsAdmin && userCtx.UserID != id {
+		return nil, model.NewError("401", "Forbidden.")
+	}
+
 	dataCustomer, err := svc.repoCustomer.Get(id)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -133,7 +166,36 @@ func (svc *customerService) GetCustomer(id string) (*model.DataCustomerResponse,
 	}, nil
 }
 
-func (svc *customerService) ListCustomer(req model.ListCustomerRequest) ([]model.DataCustomerResponse, int64, error) {
+// Specific for middleware auth
+func (svc *customerService) GetCustomerByID(id string) (*model.DataCustomerResponse, error) {
+	dataCustomer, err := svc.repoCustomer.Get(id)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return nil, model.NewError("500", "Internal server error.")
+	} else if dataCustomer == nil {
+		return nil, model.NewError("404", "Data not found.")
+	}
+
+	return &model.DataCustomerResponse{
+		ID:            dataCustomer.ID.String(),
+		Name:          dataCustomer.Name,
+		Email:         dataCustomer.Email,
+		Username:      dataCustomer.Username,
+		PhoneNumber:   dataCustomer.PhoneNumber,
+		LastLoginDate: dataCustomer.LastLoginDate,
+	}, nil
+}
+
+func (svc *customerService) ListCustomer(ctx context.Context, req model.ListCustomerRequest) ([]model.DataCustomerResponse, int64, error) {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return make([]model.DataCustomerResponse, 0), 0, model.NewError("401", "Invalid login session.")
+	} else if !userCtx.IsAdmin {
+		return make([]model.DataCustomerResponse, 0), 0, model.NewError("401", "Forbidden.")
+	}
+
 	if req.Page == 0 {
 		req.Page = 1
 	}
@@ -168,13 +230,12 @@ func (svc *customerService) ListCustomer(req model.ListCustomerRequest) ([]model
 }
 
 func (svc *customerService) LoginCustomer(req *model.LoginCustomerRequest) (string, error) {
-	username := req.Email
-	dataCust, err := svc.repoCustomer.GetByUsernameOrEmail(username, req.Email)
+	dataCust, err := svc.repoCustomer.GetByUsernameOrEmail(req.Username, req.Email)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
 		return "", model.NewError("500", "Internal server error.")
 	} else if dataCust == nil {
-		return "", model.NewError("404", "Data not found.")
+		return "", model.NewError("404", "Wrong Email/Username.")
 	}
 
 	decodedBytes, _ := hex.DecodeString(dataCust.Password)
@@ -227,7 +288,16 @@ func (service *customerService) saveLog(data *entity.Customer) (err error) {
 	return
 }
 
-func (svc *customerService) UpdateCustomer(req *model.UpdateCustomerRequest) error {
+func (svc *customerService) UpdateCustomer(ctx context.Context, req *model.UpdateCustomerRequest) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if !userCtx.IsAdmin && userCtx.UserID != req.ID {
+		return model.NewError("401", "Forbidden.")
+	}
+
 	oldData, err := svc.repoCustomer.Get(req.ID)
 	if err != nil {
 		log.Println("Error while get data, cause: ", err)
@@ -246,7 +316,7 @@ func (svc *customerService) UpdateCustomer(req *model.UpdateCustomerRequest) err
 		}
 	}
 
-	logReason := fmt.Sprintf("Perubahan data oleh %v", req.ID)
+	logReason := fmt.Sprintf("Perubahan data oleh %v", userCtx.UserID)
 	oldData.Audit.LogReason = &logReason
 
 	err = svc.saveLog(oldData)
@@ -272,7 +342,7 @@ func (svc *customerService) UpdateCustomer(req *model.UpdateCustomerRequest) err
 			CreatedAt: oldData.Audit.CreatedAt,
 			CreatedBy: oldData.Audit.CreatedBy,
 			UpdatedAt: &timeNow,
-			UpdatedBy: req.ID,
+			UpdatedBy: fmt.Sprintf("%s|%s", userCtx.UserID, userCtx.Username),
 		},
 	}
 
