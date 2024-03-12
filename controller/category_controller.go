@@ -26,6 +26,7 @@ func (controller *categoryController) CategoryRoutes(e *echo.Echo) {
 
 	// Category EP
 	var categoryRoute = e.Group("/categories")
+	categoryRoute.Use(middleware.BodyDump(Logger))
 	categoryRoute.POST("/", controller.CreateCategory, controller.middlewareCheckAuthAdmin)
 	categoryRoute.POST("/list", controller.ListCategory)
 	categoryRoute.DELETE("/:id", controller.DeleteCategory, controller.middlewareCheckAuthAdmin)

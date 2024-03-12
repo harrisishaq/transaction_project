@@ -27,6 +27,7 @@ func (controller *productController) ProductRoutes(e *echo.Echo) {
 
 	// Product EP
 	var productRoute = e.Group("/products")
+	productRoute.Use(middleware.BodyDump(Logger))
 	productRoute.POST("/", controller.CreateProduct, controller.middlewareCheckAuthAdmin)
 	productRoute.POST("/list", controller.ListProduct)
 	productRoute.DELETE("/:id", controller.DeleteProduct, controller.middlewareCheckAuthAdmin)
