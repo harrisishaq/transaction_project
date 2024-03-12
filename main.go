@@ -36,18 +36,21 @@ func main() {
 	categoryRepo := repository.NewCategoryRepository(dbInit)
 	productRepo := repository.NewProductRepository(dbInit)
 	customerRepo := repository.NewCustomerRepository(dbInit)
+	cartRepository := repository.NewCartRepository(dbInit)
 
 	// setup services
 	usersService := service.NewUserService(usersRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	productService := service.NewProductService(categoryRepo, productRepo)
 	customerService := service.NewCustomerService(customerRepo)
+	cartService := service.NewCartService(cartRepository, productRepo)
 
 	// setup controller
 	usersController := controller.NewUserController(usersService)
 	categoryController := controller.NewCategoryController(categoryService, usersService)
 	productcontroller := controller.NewProductController(productService, usersService)
 	customerController := controller.NewCustomerController(customerService, usersService)
+	cartController := controller.NewCartController(cartService, customerService)
 
 	// migrate database
 	migrate := gormigrate.New(dbInit, gormigrate.DefaultOptions, []*gormigrate.Migration{
@@ -63,6 +66,7 @@ func main() {
 					&entity.ProductLog{},
 					&entity.Customer{},
 					&entity.CustomerLog{},
+					&entity.Cart{},
 				); err != nil {
 					return err
 				}
@@ -116,6 +120,7 @@ func main() {
 	categoryController.CategoryRoutes(e)
 	productcontroller.ProductRoutes(e)
 	customerController.CustomerRoutes(e)
+	cartController.CartRoutes(e)
 
 	e.Logger.Fatal(e.Start(":3003"))
 }

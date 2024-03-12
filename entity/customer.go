@@ -16,6 +16,7 @@ type Customer struct {
 	PhoneNumber     string
 	LastLoginDate   *time.Time `gorm:"default:null"`
 	Session         string
+	Cart            Cart
 	Audit           *Audit `gorm:"type:json;serializer:json;default:null"`
 }
 
