@@ -12,14 +12,12 @@ import (
 type categoryController struct {
 	Service     service.CategoryService
 	UserService service.UserService
-	CustService service.CustomerService
 }
 
-func NewCategoryController(service service.CategoryService, userService service.UserService, custService service.CustomerService) *categoryController {
+func NewCategoryController(service service.CategoryService, userService service.UserService) *categoryController {
 	return &categoryController{
 		Service:     service,
 		UserService: userService,
-		CustService: custService,
 	}
 }
 
