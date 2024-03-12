@@ -224,6 +224,34 @@ func (svc *userService) LoginUser(req *model.LoginUserRequest) (string, error) {
 	return token, nil
 }
 
+func (svc *userService) LogoutUser(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if userCtx.UserID != id {
+		return model.NewError("401", "Forbidden.")
+	}
+
+	dataUser, err := svc.repoUser.Get(id)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	} else if dataUser == nil {
+		return model.NewError("400", "Data not found.")
+	}
+
+	dataUser.Session = ""
+	err = svc.repoUser.Update(dataUser)
+	if err != nil {
+		log.Println("Error while update data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	}
+
+	return nil
+}
+
 func (service *userService) saveLog(data *entity.User) (err error) {
 	dataLog := entity.UserLog{
 		ID:            fmt.Sprintf("%s-%d", data.ID.String(), data.Audit.CurrNo),

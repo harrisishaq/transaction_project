@@ -28,6 +28,7 @@ func (controller *customerController) CustomerRoutes(e *echo.Echo) {
 	customerRoute.POST("/", controller.CreateCustomer, controller.middlewareCheckAuthAdmin)
 	customerRoute.POST("/list", controller.ListCustomers, controller.middlewareCheckAuthAdmin)
 	customerRoute.POST("/login", controller.Login)
+	customerRoute.POST("/logout/:id", controller.Logout, controller.middlewareCheckAuthCust)
 	customerRoute.DELETE("/:id", controller.DeleteCustomer, controller.middlewareCheckAuthAdmin)
 	customerRoute.GET("/:id", controller.GetCustomer, controller.middlewareCheckAuth)
 	customerRoute.PUT("/:id", controller.UpdateCustomer, controller.middlewareCheckAuth)
@@ -119,6 +120,22 @@ func (ctrl *customerController) Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.NewJsonResponse(true).SetData(token))
+}
+
+func (ctrl *customerController) Logout(c echo.Context) error {
+	id := c.Param("id")
+
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
+	}
+
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.LogoutCustomer(ctx, id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
+	}
+
+	return c.JSON(http.StatusOK, model.NewJsonResponse(true))
 }
 
 func (ctrl *customerController) UpdateCustomer(c echo.Context) error {

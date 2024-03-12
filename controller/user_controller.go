@@ -26,6 +26,7 @@ func (controller *userController) UserRoutes(e *echo.Echo) {
 	userRoute.POST("/", controller.CreateUser, controller.middlewareCheckAuth)
 	userRoute.POST("/list", controller.ListUsers, controller.middlewareCheckAuth)
 	userRoute.POST("/login", controller.Login)
+	userRoute.POST("/logout/:id", controller.Logout, controller.middlewareCheckAuth)
 	userRoute.DELETE("/:id", controller.DeleteUser, controller.middlewareCheckAuth)
 	userRoute.GET("/:id", controller.GetUser, controller.middlewareCheckAuth)
 	userRoute.PUT("/:id", controller.UpdateUser, controller.middlewareCheckAuth)
@@ -111,6 +112,22 @@ func (ctrl *userController) Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.NewJsonResponse(true).SetData(token))
+}
+
+func (ctrl *userController) Logout(c echo.Context) error {
+	id := c.Param("id")
+
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, model.NewJsonResponse(false).SetError("400", "Bad Request"))
+	}
+
+	var ctx = model.SetUserContext(c.Request().Context(), c.Get("userCtx"))
+	err := ctrl.service.LogoutUser(ctx, id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.(*model.JsonResponse))
+	}
+
+	return c.JSON(http.StatusOK, model.NewJsonResponse(true))
 }
 
 func (ctrl *userController) UpdateUser(c echo.Context) error {

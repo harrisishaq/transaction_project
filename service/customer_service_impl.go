@@ -163,6 +163,7 @@ func (svc *customerService) GetCustomer(ctx context.Context, id string) (*model.
 		Username:      dataCustomer.Username,
 		PhoneNumber:   dataCustomer.PhoneNumber,
 		LastLoginDate: dataCustomer.LastLoginDate,
+		Session:       dataCustomer.Session,
 	}, nil
 }
 
@@ -183,6 +184,7 @@ func (svc *customerService) GetCustomerByID(id string) (*model.DataCustomerRespo
 		Username:      dataCustomer.Username,
 		PhoneNumber:   dataCustomer.PhoneNumber,
 		LastLoginDate: dataCustomer.LastLoginDate,
+		Session:       dataCustomer.Session,
 	}, nil
 }
 
@@ -263,6 +265,34 @@ func (svc *customerService) LoginCustomer(req *model.LoginCustomerRequest) (stri
 	}
 
 	return token, nil
+}
+
+func (svc *customerService) LogoutCustomer(ctx context.Context, id string) error {
+	// Get userContext
+	var userCtx = model.GetUserContext(ctx)
+	if userCtx == nil {
+		log.Printf("userCtx nil")
+		return model.NewError("401", "Invalid login session.")
+	} else if userCtx.UserID != id {
+		return model.NewError("401", "Forbidden.")
+	}
+
+	dataCust, err := svc.repoCustomer.Get(id)
+	if err != nil {
+		log.Println("Error while get data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	} else if dataCust == nil {
+		return model.NewError("400", "Data not found.")
+	}
+
+	dataCust.Session = ""
+	err = svc.repoCustomer.Update(dataCust)
+	if err != nil {
+		log.Println("Error while update data, cause: ", err)
+		return model.NewError("500", "Internal server error.")
+	}
+
+	return nil
 }
 
 func (service *customerService) saveLog(data *entity.Customer) (err error) {

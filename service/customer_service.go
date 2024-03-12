@@ -15,6 +15,7 @@ type (
 		GetCustomerByID(id string) (*model.DataCustomerResponse, error)
 		ListCustomer(ctx context.Context, req model.ListCustomerRequest) ([]model.DataCustomerResponse, int64, error)
 		LoginCustomer(req *model.LoginCustomerRequest) (string, error)
+		LogoutCustomer(ctx context.Context, id string) error
 		UpdateCustomer(ctx context.Context, req *model.UpdateCustomerRequest) error
 		UpdateSesion(req *model.UpdateSessionCustomerRequest) error
 	}
