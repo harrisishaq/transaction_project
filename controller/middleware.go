@@ -149,7 +149,7 @@ func (controller *categoryController) middlewareCheckAuth(next echo.HandlerFunc)
 			if err != nil {
 				log.Println("Error Cause: ", err)
 				return c.JSON(http.StatusUnauthorized, model.NewJsonResponse(false).SetError("500", "Internal server error"))
-			} else if dataCust == nil {
+			} else if dataCust != nil {
 				userCtx.Name = dataCust.Name
 				userCtx.Username = dataCust.Username
 				userCtx.Email = dataCust.Email
